@@ -661,6 +661,13 @@ class SX127x: public PhysicalLayer {
     int16_t scanChannel(const ChannelScanConfig_t &config) override;
 
     /*!
+      \brief Reset the AGC gain state by performing a sleep and standby cycle.
+      Leaves the radio in standby mode.
+      \returns \ref status_codes
+    */
+    int16_t resetAGC() override;
+
+    /*!
       \brief Sets the %LoRa module to sleep to save power. %Module will not be able to transmit or receive any data while in sleep mode.
       %Module will wake up automatically when methods like transmit or receive are called.
       \returns \ref status_codes

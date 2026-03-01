@@ -279,6 +279,15 @@ int16_t SX127x::scanChannel(const ChannelScanConfig_t &config) {
   return(RADIOLIB_CHANNEL_FREE);
 }
 
+int16_t SX127x::resetAGC() {
+  // sleep to reset the LNA/AGC gain state
+  int16_t state = sleep();
+  RADIOLIB_ASSERT(state);
+
+  // wake back to standby
+  return(standby());
+}
+
 int16_t SX127x::sleep() {
   // set RF switch (if present)
   this->mod->setRfSwitchState(Module::MODE_IDLE);

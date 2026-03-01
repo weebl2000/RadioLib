@@ -177,6 +177,14 @@ class LR11x0: public LRxxxx {
     int16_t standby(uint8_t mode, bool wakeup);
 
     /*!
+      \brief Reset the AGC gain state by performing a warm sleep, recalibration, and
+      image rejection calibration cycle. Re-applies RX boosted gain setting if previously
+      configured. Leaves the radio in standby mode.
+      \returns \ref status_codes
+    */
+    int16_t resetAGC() override;
+
+    /*!
       \brief Sets the module to sleep mode. To wake the device up, call standby().
       Overload with warm start enabled for PhysicalLayer compatibility.
       \returns \ref status_codes
@@ -931,6 +939,7 @@ class LR11x0: public LRxxxx {
 #endif
     uint8_t wifiScanMode = 0;
     bool gnss = false;
+    bool rxBoostedGainMode = false;
 
     int16_t modSetup(float tcxoVoltage, uint8_t modem);
     bool findChip(uint8_t ver);

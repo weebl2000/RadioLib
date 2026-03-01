@@ -115,6 +115,10 @@ int16_t PhysicalLayer::receive(uint8_t* data, size_t len, RadioLibTime_t timeout
   return(RADIOLIB_ERR_UNSUPPORTED);
 }
 
+int16_t PhysicalLayer::resetAGC() {
+  return(RADIOLIB_ERR_UNSUPPORTED);
+}
+
 int16_t PhysicalLayer::sleep() {
   return(RADIOLIB_ERR_UNSUPPORTED);
 }

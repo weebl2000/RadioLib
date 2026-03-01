@@ -325,6 +325,15 @@ class PhysicalLayer {
     #endif
 
     /*!
+      \brief Reset the AGC (Automatic Gain Control) gain state by performing a warm sleep
+      and recalibration cycle. This can fix "stuck" receiver gain states where receive
+      sensitivity degrades over time. After calling this method, the radio will be in standby mode.
+      The caller is responsible for calling startReceive() afterward if reception is desired.
+      \returns \ref status_codes
+    */
+    virtual int16_t resetAGC();
+
+    /*!
       \brief Sets module to sleep.
       \returns \ref status_codes
     */

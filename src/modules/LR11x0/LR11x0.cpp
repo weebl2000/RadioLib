@@ -343,6 +343,32 @@ int16_t LR11x0::standby(uint8_t mode, bool wakeup) {
   return(this->SPIcommand(RADIOLIB_LR11X0_CMD_SET_STANDBY, true, buff, 1));
 }
 
+int16_t LR11x0::resetAGC() {
+  // warm sleep to power down the analog frontend
+  int16_t state = sleep(true, 0);
+  RADIOLIB_ASSERT(state);
+
+  // wake to RC standby
+  state = standby(RADIOLIB_LR11X0_STANDBY_RC, true);
+  RADIOLIB_ASSERT(state);
+
+  // recalibrate all blocks
+  state = calibrate(RADIOLIB_LR11X0_CALIBRATE_ALL);
+  RADIOLIB_ASSERT(state);
+
+  // re-calibrate image rejection for the operating frequency
+  state = calibrateImageRejection(this->freqMHz - 4.0f, this->freqMHz + 4.0f);
+  RADIOLIB_ASSERT(state);
+
+  // re-apply RX boosted gain if it was configured
+  if(this->rxBoostedGainMode) {
+    state = setRxBoostedGainMode(true);
+    RADIOLIB_ASSERT(state);
+  }
+
+  return(RADIOLIB_ERR_NONE);
+}
+
 int16_t LR11x0::sleep() {
   return(LR11x0::sleep(true, 0));
 }
@@ -1205,6 +1231,7 @@ int16_t LR11x0::setRegulatorDCDC() {
 }
 
 int16_t LR11x0::setRxBoostedGainMode(bool en) {
+  this->rxBoostedGainMode = en;
   uint8_t buff[1] = { (uint8_t)en };
   return(this->SPIcommand(RADIOLIB_LR11X0_CMD_SET_RX_BOOSTED, true, buff, sizeof(buff)));
 }
