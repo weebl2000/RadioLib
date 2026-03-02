@@ -207,6 +207,14 @@ class LR2021: public LRxxxx {
     int16_t standby(uint8_t mode, bool wakeup);
 
     /*!
+      \brief Reset the AGC gain state by performing a warm sleep, recalibration, and
+      frontend calibration cycle. Re-applies RX path and boost gain settings if previously
+      configured. Leaves the radio in standby mode.
+      \returns \ref status_codes
+    */
+    int16_t resetAGC() override;
+
+    /*!
       \brief Sets the module to sleep mode. To wake the device up, call standby().
       Overload with warm start enabled for PhysicalLayer compatibility.
       \returns \ref status_codes

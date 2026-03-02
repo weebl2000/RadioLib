@@ -398,6 +398,35 @@ int16_t LR2021::standby(uint8_t mode, bool wakeup) {
   return(this->SPIcommand(RADIOLIB_LR2021_CMD_SET_STANDBY, true, buff, sizeof(buff)));
 }
 
+int16_t LR2021::resetAGC() {
+  // warm sleep to power down the analog frontend
+  int16_t state = sleep(true, 0);
+  RADIOLIB_ASSERT(state);
+
+  // wake to RC standby
+  state = standby(RADIOLIB_LR2021_STANDBY_RC, true);
+  RADIOLIB_ASSERT(state);
+
+  // recalibrate all blocks
+  state = calibrate(RADIOLIB_LR2021_CALIBRATE_ALL);
+  RADIOLIB_ASSERT(state);
+
+  // re-calibrate frontend for the operating frequency
+  uint16_t frequencies[3] = { (uint16_t)((this->freqMHz / 4.0f) + 0.5f), 0, 0 };
+  frequencies[0] |= (this->freqMHz > RADIOLIB_LR2021_LF_CUTOFF_FREQ) ? RADIOLIB_LR2021_CALIBRATE_FE_HF_PATH : RADIOLIB_LR2021_CALIBRATE_FE_LF_PATH;
+  state = calibrateFrontEnd(const_cast<const uint16_t*>(frequencies));
+  RADIOLIB_ASSERT(state);
+
+  // re-apply RX path with boost settings
+  state = setRxPath(
+    this->highFreq ? RADIOLIB_LR2021_RX_PATH_HF : RADIOLIB_LR2021_RX_PATH_LF,
+    this->highFreq ? this->gainModeHf : this->gainModeLf
+  );
+  RADIOLIB_ASSERT(state);
+
+  return(RADIOLIB_ERR_NONE);
+}
+
 int16_t LR2021::sleep() {
   return(this->sleep(true, 0));
 }
